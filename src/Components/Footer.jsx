@@ -1,0 +1,8 @@
+
+export default function Foot (){
+    return (
+        <footer>
+        <p>&copy; 2026 E-Wallet. Tous droits réservés.</p>
+        </footer>
+    )
+}
