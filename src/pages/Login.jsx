@@ -1,7 +1,15 @@
+import { useState } from "react";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 
-export default function Login() {
+export default function Login({ setIsLoggedIn }) {
+ 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => setIsLoggedIn(true);
+
+  console.log("Login clicked");
   return (
     <>
       <Header />
@@ -34,7 +42,7 @@ export default function Login() {
                 <span id="display" className="toggle-password">👁</span>
               </div>
               <p id="result"></p>
-              <button id="submitbtn" type="button" className="btn btn-primary">
+              <button id="submitbtn" type="button" className="btn btn-primary"  onClick={handleLogin}>
                 Se connecter
               </button>
             </form>

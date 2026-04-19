@@ -1,162 +1,198 @@
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
-import React, { useState } from 'react';
+import { useState } from "react";
 
-export default function Dashboard() {
+export default function Dashboard({ setIsLoggedIn }) {
+
+  const [user, setUser] = useState({
+    name: "Ali",
+    balance: 5000,
+    income: 2000,
+    expenses: 800,
+    cards: [
+      { num: "**** 4242", type: "Visa" }
+    ],
+    transactions: [
+      { id: 1, type: "credit", from: "Salary", amount: 2000, date: "13/04/2026" },
+      { id: 2, type: "debit", to: "Amazon", amount: 300, date: "12/04/2026" }
+    ]
+  });
+
+  const [amount, setAmount] = useState("");
   const [showTransfer, setShowTransfer] = useState(false);
   const [showRecharge, setShowRecharge] = useState(false);
 
+  // 💸 TRANSFER
+  const transferMoney = () => {
+    const value = Number(amount);
+    if (!value || value <= 0) return;
+
+    setUser(prev => ({
+      ...prev,
+      balance: prev.balance - value,
+      transactions: [
+        {
+          id: Date.now(),
+          type: "debit",
+          to: "Beneficiary",
+          amount: value,
+          date: new Date().toLocaleDateString()
+        },
+        ...prev.transactions
+      ]
+    }));
+
+    setAmount("");
+    setShowTransfer(false);
+  };
+
+  // 💰 RECHARGE
+  const rechargeMoney = () => {
+    const value = Number(amount);
+    if (!value || value <= 0) return;
+
+    setUser(prev => ({
+      ...prev,
+      balance: prev.balance + value,
+      transactions: [
+        {
+          id: Date.now(),
+          type: "credit",
+          from: "Recharge",
+          amount: value,
+          date: new Date().toLocaleDateString()
+        },
+        ...prev.transactions
+      ]
+    }));
+
+    setAmount("");
+    setShowRecharge(false);
+  };
+
   return (
     <>
-      <Header/>
+      <Header />
+
       <main className="dashboard-main">
         <div className="dashboard-container">
-          
-          {/* Sidebar Navigation */}
+
+          {/* SIDEBAR (same as old HTML) */}
           <aside className="dashboard-sidebar">
-            <nav className="sidebar-nav">
-              <ul>
-                <li className="active">
-                  <a href="#overview"><i className="fas fa-home"></i> <span>Vue d'ensemble</span></a>
-                </li>
-                <li>
-                  <a href="#transactions"><i className="fas fa-exchange-alt"></i> <span>Transactions</span></a>
-                </li>
-                <li>
-                  <a href="#cards"><i className="fas fa-credit-card"></i> <span>Mes cartes</span></a>
-                </li>
-                <li>
-                  <a href="#transfers"><i className="fas fa-paper-plane"></i> <span>Transferts</span></a>
-                </li>
-                <li className="separator"></li>
-                <li>
-                  <a href="#support"><i className="fas fa-headset"></i> <span>Aide & Support</span></a>
-                </li>
-              </ul>
-            </nav>
+            <ul>
+              <li className="active">Vue d'ensemble</li>
+              <li>Transactions</li>
+              <li>Cartes</li>
+              <li>Transferts</li>
+            </ul>
+
+            <button onClick={() => setIsLoggedIn(false)}>
+              Logout
+            </button>
           </aside>
 
-          {/* Main Content Area */}
+          {/* CONTENT */}
           <div className="dashboard-content">
-            <section id="overview" className="dashboard-section active">
-              <div className="section-header">
-                <h2>Bonjour, <span id="greetingName">?</span> !</h2>
-                <p className="date-display" id="currentDate">13 Avril 2026</p>
+
+            {/* OVERVIEW HEADER */}
+            <div className="section-header">
+              <h2>Bonjour, <span>{user.name}</span> !</h2>
+              <p>{new Date().toLocaleDateString()}</p>
+            </div>
+
+            {/* SUMMARY CARDS (same structure as old dashboard) */}
+            <div className="summary-cards">
+
+              <div className="summary-card">
+                <span>Solde disponible</span>
+                <h3>{user.balance} MAD</h3>
               </div>
 
-              {/* Summary Cards */}
-              <div className="summary-cards">
-                <div className="summary-card">
-                  <div className="card-icon blue"><i className="fas fa-wallet"></i></div>
-                  <div className="card-details">
-                    <span className="card-label">Solde disponible</span>
-                    <span className="card-value" id="availableBalance">?</span>
-                  </div>
-                </div>
-
-                <div className="summary-card">
-                  <div className="card-icon green"><i className="fas fa-arrow-up"></i></div>
-                  <div className="card-details">
-                    <span className="card-label">Revenus</span>
-                    <span className="card-value" id="monthlyIncome">?</span>
-                  </div>
-                </div>
-
-                <div className="summary-card">
-                  <div className="card-icon red"><i className="fas fa-arrow-down"></i></div>
-                  <div className="card-details">
-                    <span className="card-label">Dépenses</span>
-                    <span className="card-value" id="monthlyExpenses">?</span>
-                  </div>
-                </div>
-
-                <div className="summary-card">
-                  <div className="card-icon purple"><i className="fas fa-credit-card"></i></div>
-                  <div className="card-details">
-                    <span className="card-label">Cartes actives</span>
-                    <span className="card-value" id="activeCards">?</span>
-                  </div>
-                </div>
+              <div className="summary-card">
+                <span>Revenus</span>
+                <h3>{user.income} MAD</h3>
               </div>
 
-              {/* Actions Rapides */}
-              <div className="quick-actions">
-                <h3>Actions rapides</h3>
-                <div className="action-buttons">
-                  <button className="action-btn" onClick={() => setShowTransfer(true)}>
-                    <i className="fas fa-paper-plane"></i> <span>Transférer</span>
-                  </button>
-                  <button className="action-btn" onClick={() => setShowRecharge(true)}>
-                    <i className="fas fa-plus-circle"></i> <span>Recharger</span>
-                  </button>
-                  <button className="action-btn">
-                    <i className="fas fa-hand-holding-usd"></i> <span>Demander</span>
-                  </button>
-                </div>
+              <div className="summary-card">
+                <span>Dépenses</span>
+                <h3>{user.expenses} MAD</h3>
               </div>
 
-              {/* Recent Transactions */}
-              <div className="recent-transactions">
-                <div className="section-header">
-                  <h3>Transactions récentes</h3>
-                </div>
-                <div className="transactions-list" id="recentTransactionsList">
-                  <div className="transaction-item">
-                  </div>
-                </div>
+              <div className="summary-card">
+                <span>Cartes actives</span>
+                <h3>{user.cards.length}</h3>
               </div>
-            </section>
+
+            </div>
+
+            {/* QUICK ACTIONS (same idea as old HTML buttons) */}
+            <div className="quick-actions">
+              <button onClick={() => setShowTransfer(true)}>
+                Transférer
+              </button>
+
+              <button onClick={() => setShowRecharge(true)}>
+                Recharger
+              </button>
+            </div>
+
+            {/* TRANSACTIONS LIST */}
+            <div className="recent-transactions">
+              <h3>Transactions récentes</h3>
+
+              {user.transactions.map(t => (
+                <div key={t.id} className="transaction-item">
+                  <span>
+                    {t.type === "credit"
+                      ? `De: ${t.from}`
+                      : `À: ${t.to}`}
+                  </span>
+                  <span>{t.amount} MAD</span>
+                  <small>{t.date}</small>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
 
-        {/* Transfer Section */}
-        <section id="transfer-section" className={showTransfer ? "" : "hidden"}>
-          <div className="section-header">
+        {/* TRANSFER SECTION (same as old HTML behavior) */}
+        {showTransfer && (
+          <section className="modal">
             <h2>Effectuer un transfert</h2>
-            <button className="btn btn-close" onClick={() => setShowTransfer(false)}>
-              <i className="fas fa-times"></i>
-            </button>
-          </div>
-          <div className="transfer-container">
-            <form id="transferForm" className="transfer-form">
-              <div className="form-group">
-                <label htmlFor="beneficiary"><i className="fas fa-user"></i> Bénéficiaire</label>
-                <select id="beneficiary" required>
-                  <option value="" disabled selected>Choisir un bénéficiaire</option>
-                </select>
-              </div>
-              <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowTransfer(false)}>Annuler</button>
-                <button type="submit" className="btn btn-primary">Transférer</button>
-              </div>
-            </form>
-          </div>
-        </section>
 
-        {/* Recharge Section  */}
-        <section id="recharger-section" className={showRecharge ? "" : "hidden"}>
-          <div className="section-header">
-            <h2>Effectuer une Recharge</h2>
-            <button className="btn btn-close" onClick={() => setShowRecharge(false)}>
-              <i className="fas fa-times"></i>
-            </button>
-          </div>
-          <form id="rechargeForm" className="Recharger-container">
-            <div className="form-group">
-              <label htmlFor="rechargeAmount"><i className="fas fa-coins"></i> Montant</label>
-              <div className="amount-input">
-                <input type="number" id="rechargeAmount" placeholder="0.00" required />
-                <span className="currency">MAD</span>
-              </div>
-            </div>
-            <div className="form-actions">
-              <button type="button" className="btn btn-secondary" onClick={() => setShowRecharge(false)}>Annuler</button>
-              <button type="submit" className="btn btn-primary">Recharger</button>
-            </div>
-          </form>
-        </section>
+            <input
+              type="number"
+              placeholder="Montant"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+
+            <button onClick={transferMoney}>Transférer</button>
+            <button onClick={() => setShowTransfer(false)}>Annuler</button>
+          </section>
+        )}
+
+        {/* RECHARGE SECTION */}
+        {showRecharge && (
+          <section className="modal">
+            <h2>Effectuer une recharge</h2>
+
+            <input
+              type="number"
+              placeholder="Montant"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+
+            <button onClick={rechargeMoney}>Recharger</button>
+            <button onClick={() => setShowRecharge(false)}>Annuler</button>
+          </section>
+        )}
+
       </main>
-      <Footer/>
+
+      <Footer />
     </>
   );
 }
